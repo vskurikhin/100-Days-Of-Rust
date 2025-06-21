@@ -1,0 +1,11 @@
+[package]
+name = "next-prime"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+miller_rabin = "1.1.1"
+num-bigint = { version = "0.3.3", features = ["rand"] }
+num-prime = "0.4.4"
+num-traits = "0.2.19"
+rand = "0.7.3"
