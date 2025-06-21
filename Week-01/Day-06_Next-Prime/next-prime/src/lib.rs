@@ -1,12 +1,10 @@
+use num_bigint::BigUint;
 use num_bigint::RandBigInt;
-use num_bigint::{BigInt, BigUint};
-use num_integer::Integer;
 use num_prime::PrimalityUtils;
-use num_traits::{One, ToPrimitive, one, zero};
-use std::ops::{Div, Sub};
+use num_traits::{one, zero};
 
 pub fn next_prime(n: u128) -> u128 {
-    for i in n..u128::MAX {
+    for i in n..u128::max_value() {
         if is_prime(&i) {
             return i;
         }
@@ -21,13 +19,13 @@ pub fn next_prime(n: u128) -> u128 {
 pub fn is_prime(p: &u128) -> bool {
     match p {
         0..2 => false,
-        _ => _is_prime(p),
+        _ => is_prime_miller_rabin(p) || u128::is_prp(p, 128) || u128::is_eslprp(p, Some(2)),
     }
 }
 
 // Тест Миллера-Рабина на простоту
-// O(k·log³(n))
-pub fn is_prime_miller_rabin_probable(p: &u128) -> bool {
+// O(klog3(n))
+pub fn is_prime_miller_rabin(p: &u128) -> bool {
     let num = &BigUint::from(*p);
     if num <= &one() || num == &BigUint::from(4u8) {
         return false;
@@ -37,19 +35,19 @@ pub fn is_prime_miller_rabin_probable(p: &u128) -> bool {
     }
 
     let mut d = num - 1u8;
-    
     while &d % 2u8 == zero() {
         d /= 2u8
     }
+
     for _ in 0..10 {
-        if miller_probable_test(d.clone(), num) == false {
+        if miller_test(d.clone(), num) == false {
             return false;
         }
     }
     true
 }
 
-// функция вычисляет (a·b) % c, принимая во внимание, что a*b может переполниться
+// функция вычисляет (a*b)%c, принимая во внимание, что a*b может переполниться
 pub fn mul_mod(a: &u128, b: &u128, c: &u128) -> u128 {
     let (mut d, mut x, mut y) = (*b, 0, a % c);
 
@@ -63,28 +61,21 @@ pub fn mul_mod(a: &u128, b: &u128, c: &u128) -> u128 {
     x % c
 }
 
-fn _is_prime(p: &u128) -> bool {
-    is_prime_miller_rabin_probable(p)
-        || u128::is_prp(p, 128)
-        || u128::is_eslprp(p, Some(2))
-        || is_prime_miller_test(p)
-}
-
 // Тест Миллера-Рабина на простоту, итерация показывает точность теста
-fn miller_probable_test(mut d: BigUint, n: &BigUint) -> bool {
+fn miller_test(mut d: BigUint, n: &BigUint) -> bool {
     let mut rng = rand::thread_rng();
     let mut random_num = BigUint::from(1u8);
-    
     if n != &BigUint::from(5u8) {
         random_num = rng.gen_biguint_range(&one(), &(n - 4u8));
     }
-    
     let a = BigUint::from(2u8) + random_num;
+
     let mut x = BigUint::modpow(&a, &d, &n);
 
     if x == one() || x == n - 1u8 {
         return true;
     }
+
     while d != n - 1u8 {
         x = (&x * &x) % n;
         d *= 2u8;
@@ -99,110 +90,21 @@ fn miller_probable_test(mut d: BigUint, n: &BigUint) -> bool {
     false
 }
 
-// Тест Миллера
-/*
-Ввод: n > 2, нечётное натуральное число, которое необходимо проверить на простоту;
-Вывод: составное, означает, что n является составным числом;
-       простое, означает, что n является простым числом.
-(1) Проверить, является ли n степенью какого-либо числа.
-    Если является, то вернуть составное
-(2) Найти первые m простых чисел p₁, ..., pₘ, где m такое, что pₘ ≤ ƒ(n) ≤ pₘ₊₁
-    Вычислить s и q такие, что n-1 = q·2ˢ и q - нечётное
-    Положить i = 1 перейти на шаг (4)
-(3) если i ≤ m, то i = i + 1
-    если i > m, то вернуть простое
-(4) если pᵢ|n, то вернуть составное
-    Вычислить pᵢ^q mod n, pᵢ^(q·2) mod n, ..., pᵢ^(q·2ˢ)
-(5) если pᵢ^(q·2ˢ) ≠ 1, то вернуть составное
-(6) если pᵢ^q = 1, то перейти на шаг (3)
-    Положить j = max(j : pᵢ^(q·2ʲ) mod n ≠ 1)
-(7) если pᵢ^(q·2ʲ) mod n = n - 1, то перейти на шаг (3)
-(8) вернуть составное
- */
-pub fn is_prime_miller_test(n: &u128) -> bool {
-    let checking_num = &BigInt::from(*n);
-    // (если является степенью другого числа)
-    if is_power_of_number(checking_num) {
-        return false;
-    }
-    let log_n = f64::log(*n as f64, std::f64::consts::E);
-    let log_log_n = f64::log(log_n, std::f64::consts::E);
-    let max_checked = BigInt::from(log_log_n.ceil() as u128);
-    let mut base_current = BigInt::from(2);
-    let mut is_prime = true;
-
-    while base_current.le(&max_checked) {
-        // (если не сильно псевдопростое по этому основанию)
-        if is_strong_pseudo_prime(checking_num, &base_current) {
-            // (тогда число не простое)
-            is_prime = false;
-            break;
-        }
-        base_current = BigInt::from(next_prime(base_current.to_u128().unwrap()));
-    }
-    is_prime
-}
-
-fn is_strong_pseudo_prime(checking_num: &BigInt, base_current: &BigInt) -> bool {
-    let two = &BigInt::from(2);
-    let mut exp = &checking_num.sub(BigInt::one());
-    // (exp будет меняться, а проверка остатка -1 эквивалентна проверке остатка (checkingNum - 1))
-    let ost = exp.clone();
-    let mut res = BigInt::modpow(base_current, &exp, checking_num);
-
-    if res.ne(&BigInt::one()) {
-        return false;
-    }
-    // (тест Ферма пройден)
-    loop {
-        // (чётное; при первом попадании всегда будет чётным, далее цикл до тех пор пока снова станет нечётным)
-        let exp = &exp.clone().div(two);
-        // (остаток -1 всегда должны проверить)
-        res = BigInt::modpow(base_current, exp, checking_num);
-
-        if res.eq(&ost) {
-            return true;
-        }
-        // (снова стало нечётным — нужно проверить ещё на 1)
-        if exp.div(two).eq(&BigInt::one()) {
-            let res = BigInt::modpow(base_current, exp, checking_num);
-            if res.eq(&BigInt::one()) {
-                return true;
-            }
-            break;
-        }
-    }
-    false
-}
-
-// Функция, немного более сложная, которая определяет, является ли передаваемое число,
-// степенью другого, простого числа. Нужно найти максимально простую реализацию этой функции.
-fn is_power_of_number(n: &BigInt) -> bool {
-    let mp = BigInt::modpow(&BigInt::from(2), &n.sub(BigInt::one()), n);
-    mp.gcd(n).ge(&BigInt::one())
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::{
-        is_power_of_number, is_prime as next_prime_is_prime, is_prime_miller_rabin_probable, mul_mod,
-        next_prime,
-    };
+    use crate::{next_prime, is_prime as next_prime_is_prime, is_prime_miller_rabin, mul_mod};
     use miller_rabin::is_prime;
-    use num_bigint::BigInt;
 
     #[test]
     fn test_empty_case() {}
 
+
     #[test]
     fn test_case_extra_primes() {
         assert_eq!(next_prime(0), 2);
-        assert_eq!(next_prime(u128::MAX), 0);
-        assert_eq!(next_prime(u128::MAX - 1), 0);
-        assert_eq!(
-            next_prime(u128::MAX - 2),
-            340282366920938463463374607431768211453
-        );
+        assert_eq!(next_prime(u128::max_value()), 0);
+        assert_eq!(next_prime(u128::max_value()-1), 0);
+        assert_eq!(next_prime(u128::max_value()-2), 340282366920938463463374607431768211453);
     }
 
     #[test]
@@ -245,7 +147,7 @@ mod tests {
         ];
         for prim in primes {
             let cp: &u128 = &prim;
-            assert_eq!(is_prime_miller_rabin_probable(cp), is_prime(cp, 96));
+            assert_eq!(is_prime_miller_rabin(cp), is_prime(cp, 96));
             assert!(next_prime_is_prime(cp));
         }
     }
@@ -255,7 +157,7 @@ mod tests {
         for n in 2..65 {
             let c = u128::pow(2, n) - 1;
             let cp: &u128 = &(c * c - 2);
-            assert_eq!(is_prime_miller_rabin_probable(cp), is_prime(cp, 96));
+            assert_eq!(is_prime_miller_rabin(cp), is_prime(cp, 96));
             assert!(next_prime_is_prime(cp));
         }
     }
@@ -264,7 +166,7 @@ mod tests {
     fn test_case_cullen_primes() {
         for n in 2..122 {
             let cp: &u128 = &((n as u128) * u128::pow(2, n) + 1);
-            assert_eq!(is_prime_miller_rabin_probable(cp), is_prime(cp, 96));
+            assert_eq!(is_prime_miller_rabin(cp), is_prime(cp, 96));
             assert!(next_prime_is_prime(cp));
         }
     }
@@ -273,7 +175,7 @@ mod tests {
     fn test_case_mersenne_primes() {
         for n in 2..128 {
             let cp: &u128 = &(u128::pow(2, n) - 1);
-            assert_eq!(is_prime_miller_rabin_probable(cp), is_prime(cp, 96));
+            assert_eq!(is_prime_miller_rabin(cp), is_prime(cp, 96));
             assert!(next_prime_is_prime(cp));
         }
     }
@@ -282,7 +184,7 @@ mod tests {
     fn test_case_fermat_primes() {
         for n in 1..7 {
             let cp: &u128 = &(u128::pow(2, u32::pow(2, n)) + 1);
-            assert_eq!(is_prime_miller_rabin_probable(cp), is_prime(cp, 96));
+            assert_eq!(is_prime_miller_rabin(cp), is_prime(cp, 96));
             assert!(next_prime_is_prime(cp));
         }
     }
@@ -320,16 +222,11 @@ mod tests {
     fn test_mul_mod_case_max() {
         assert_eq!(
             0u128,
-            mul_mod(&(u128::MAX), &(u32::MAX as u128), &(u64::MAX as u128))
+            mul_mod(
+                &(u128::max_value()),
+                &(u32::max_value() as u128),
+                &(u64::max_value() as u128)
+            )
         );
-    }
-
-    #[test]
-    fn test_is_power_of_number() {
-        let mut i = 1u128;
-        while i < 64 {
-            println!("is_power_of_number({}) => {}", i, is_power_of_number(&BigInt::from(i)));
-            i = i * 2;
-        }
     }
 }
