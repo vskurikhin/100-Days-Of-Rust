@@ -36,6 +36,6 @@ fn main() {
         };
 
         println!("You guessed: {guess}");
-        println!("Next prime number: {}", next_prime(guess));
+        println!("Next prime number: {}", next_prime(&guess));
     }
 }
