@@ -153,11 +153,11 @@ fn miller_probable_test(mut d: BigUint, n: &BigUint) -> bool {
 (8) вернуть составное
  */
 pub fn is_prime_miller_test(n: &u128) -> bool {
-    let checking_num = &BigInt::from(*n);
     // (если является степенью другого числа)
-    if is_power_of_number(checking_num) {
+    if is_power_of_number(n) {
         return false;
     }
+    let checking_num = &BigInt::from(*n);
     let log_n = f64::log(n.clone() as f64, std::f64::consts::E);
     let log_log_n = f64::log(log_n, std::f64::consts::E);
     let max_checked =
@@ -220,8 +220,8 @@ x = p^n
 n = log(x)/log(p)
 Осталось только проверить, целое ли число n.
  */
-fn is_power_of_number(n: &BigInt) -> bool {
-    let x = n.to_u128().unwrap();
+fn is_power_of_number(n: &u128) -> bool {
+    let x = *n;
     for p in 2..(x / 2) + 1 {
         let log_x = f64::log(x as f64, std::f64::consts::E);
         let log_p = f64::log(p as f64, std::f64::consts::E);
@@ -266,7 +266,6 @@ mod tests {
         mul_mod, next_prime,
     };
     use miller_rabin::is_prime;
-    use num_bigint::BigInt;
 
     #[test]
     fn test_empty_case() {}
@@ -310,7 +309,7 @@ mod tests {
             assert_eq!(is_prime_miller_rabin_probable(cp), is_prime(cp, 96));
             assert!(next_prime_is_prime(cp));
             assert_eq!(next_prime(&(cp - 1)), *cp);
-            assert!(!is_power_of_number(&BigInt::from(*cp)));
+            assert!(!is_power_of_number(cp));
         }
         for i in 0..primes.len() - 1 {
             let a = &primes[i];
@@ -422,9 +421,8 @@ mod tests {
             117649, 823543, 5764801, 40353607, 282475249,
         ];
         for power in &power_of_primes {
-            let p = BigInt::from(*power);
-            assert!(is_power_of_number(&p));
+            assert!(is_power_of_number(power));
         }
-        assert!(!is_power_of_number(&BigInt::from(13)));
+        assert!(!is_power_of_number(&13));
     }
 }
