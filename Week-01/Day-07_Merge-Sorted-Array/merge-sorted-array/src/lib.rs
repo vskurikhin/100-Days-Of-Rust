@@ -1,17 +1,18 @@
+extern crate core;
+
 use rand;
 pub use rand::Rng;
 pub use rand_isaac::IsaacRng;
 pub use rand::{SeedableRng};
 
 pub fn merge_sorted<'a>(nums1: &'a mut [i32], nums2: &[i32], m: usize, n: usize) -> &'a [i32] {
-    let mut vec1 = Vec::new();
+    let mut vec = Vec::with_capacity(m);
     for i in 0..m {
-        vec1.push(nums1[i]);
+        vec.push(nums1[i]);
     }
-    let vec2 = Vec::from(nums2);
-    let result = merge_sort_arrays_to_vec(&vec1, &vec2);
-    for i in 0..m+n {
-        nums1[i] = result[i];
+    let bs: Box<[i32]> = vec.into_boxed_slice();
+    if !merge_sort_arrays(nums1, bs.iter().as_slice(), nums2) {
+        panic!("wrong size of slices: nums1.len(): {}, nums2.len(): {} or m: {}, n: {}", nums1.len(), nums2.len(), m, n)
     }
     nums1
 }
