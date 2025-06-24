@@ -1,7 +1,21 @@
+extern crate core;
+
 use rand;
 pub use rand::Rng;
 pub use rand_isaac::IsaacRng;
 pub use rand::{SeedableRng};
+
+pub fn merge_sorted<'a>(nums1: &'a mut [i32], nums2: &[i32], m: usize, n: usize) -> &'a [i32] {
+    let mut vec = Vec::with_capacity(m);
+    for i in 0..m {
+        vec.push(nums1[i]);
+    }
+    let bs: Box<[i32]> = vec.into_boxed_slice();
+    if !merge_sort_arrays(nums1, bs.iter().as_slice(), nums2) {
+        panic!("wrong size of slices: nums1.len(): {}, nums2.len(): {} or m: {}, n: {}", nums1.len(), nums2.len(), m, n)
+    }
+    nums1
+}
 
 pub fn merge_sort_arrays(result: &mut [i32], array1: &[i32], array2: &[i32]) -> bool {
     if result.len() != array1.len() + array2.len() {
@@ -66,6 +80,14 @@ mod tests {
 
     #[test]
     fn test_empty_case() {}
+
+    #[test]
+    fn test_merge_sorted_case_1() {
+        let mut array1 = [1,2,3,0,0,0];
+        let array2 = [2,5,6];
+        let result = merge_sorted(&mut array1, &array2, 3, 3);
+        assert_eq!(result, vec![1,2,2,3,5,6]);
+    }
 
     #[test]
     fn test_test_case_0() {
