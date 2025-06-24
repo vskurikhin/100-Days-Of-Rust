@@ -42,18 +42,18 @@ We encourage you to share your progress and ask questions in the Discussions sec
 
 [Awesome Rust](https://github.com/rust-unofficial/awesome-rust)
 
-
+https://github.com/vskurikhin/100-Days-Of-Rust/tree/week-01/Week-01/Day-01_Convert-Ages-To-Days
 # Project List
 
 | Day           | Project Name                       | Completed                 |
 | ------------- |:-------------------------------------:| -------------------------:|
-| Day #1        | [Convert Age To Days](https://github.com/LiveGray/100-Days-Of-Rust/tree/main/Week-01/Day-01_Convert-Ages-To-Days)                   | :white_check_mark:      |
-| Day #2        | [Finding Nemo](https://github.com/LiveGray/100-Days-Of-Rust/tree/main/Week-01/Day-02_Finding-Nemo)                          | :white_check_mark:      |
-| Day #3        | [Barbecue Skewers](https://github.com/LiveGray/100-Days-Of-Rust/tree/main/Week-01/Day-03_Barbecue-Skewers)                      | :white_check_mark:      |
-| Day #4        | [Is Johnny Making Progress](https://github.com/LiveGray/100-Days-Of-Rust/tree/main/Week-01/Day-04_Is-Johnny-Making-Progress)             | :white_check_mark:      |
-| Day #5        | [Pair Of Socks](https://github.com/LiveGray/100-Days-Of-Rust/tree/main/Week-01/Day-05_Pair-Of-Socks)                         | :white_check_mark:      |
-| Day #6        | [Next Prime](https://github.com/LiveGray/100-Days-Of-Rust/tree/main/Week-01/Day-06_Next-Prime)                            | :white_check_mark:      |
-| Day #7        | [Merge Sorted Array](https://github.com/LiveGray/100-Days-Of-Rust/tree/main/Week-01/Day-07_Merge-Sorted-Array)                    | :white_check_mark:      |
+| Day #1        | [Convert Age To Days](https://github.com/vskurikhin/100-Days-Of-Rust/tree/week-01/Week-01/Day-01_Convert-Ages-To-Days)                   | :white_check_mark:      |
+| Day #2        | [Finding Nemo](https://github.com/vskurikhin/100-Days-Of-Rust/tree/week-01/Week-01/Day-02_Finding-Nemo)                          | :white_check_mark:      |
+| Day #3        | [Barbecue Skewers](https://github.com/vskurikhin/100-Days-Of-Rust/tree/week-01/Week-01/Day-03_Barbecue-Skewers)                      | :white_check_mark:      |
+| Day #4        | [Is Johnny Making Progress](https://github.com/vskurikhin/100-Days-Of-Rust/tree/week-01/Week-01/Day-04_Is-Johnny-Making-Progress)             | :white_check_mark:      |
+| Day #5        | [Pair Of Socks](https://github.com/vskurikhin/100-Days-Of-Rust/tree/week-01/Week-01/Day-05_Pair-Of-Socks)                         | :white_check_mark:      |
+| Day #6        | [Next Prime](https://github.com/vskurikhin/100-Days-Of-Rust/tree/week-01/Week-01/Day-06_Next-Prime)                            | :white_check_mark:      |
+| Day #7        | [Merge Sorted Array](https://github.com/vskurikhin/100-Days-Of-Rust/tree/week-01/Week-01/Day-07_Merge-Sorted-Array)                    | :white_check_mark:      |
 | Day #8        | [Letter Combinations Of A Phone Number](https://github.com/LiveGray/100-Days-Of-Rust/tree/main/Week-02/Day-08_Letter-Combinations-Of-A-Phone-Number) | :white_large_square:      |
 | Day #9        | [Trapping Rain Water](https://github.com/LiveGray/100-Days-Of-Rust/tree/main/Week-02/Day-09_Trapping-Rain-Water)                   | :white_large_square:      |
 | Day #10       | [Unique Binary Search Tree](https://github.com/LiveGray/100-Days-Of-Rust/tree/main/Week-02/Day-10_Unique-Binary-Search-Trees)             | :white_large_square:      |
