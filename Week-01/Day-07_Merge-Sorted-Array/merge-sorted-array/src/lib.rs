@@ -3,6 +3,19 @@ pub use rand::Rng;
 pub use rand_isaac::IsaacRng;
 pub use rand::{SeedableRng};
 
+pub fn merge_sorted<'a>(nums1: &'a mut [i32], nums2: &[i32], m: usize, n: usize) -> &'a [i32] {
+    let mut vec1 = Vec::new();
+    for i in 0..m {
+        vec1.push(nums1[i]);
+    }
+    let vec2 = Vec::from(nums2);
+    let result = merge_sort_arrays_to_vec(&vec1, &vec2);
+    for i in 0..m+n {
+        nums1[i] = result[i];
+    }
+    nums1
+}
+
 pub fn merge_sort_arrays(result: &mut [i32], array1: &[i32], array2: &[i32]) -> bool {
     if result.len() != array1.len() + array2.len() {
         return false
@@ -66,6 +79,14 @@ mod tests {
 
     #[test]
     fn test_empty_case() {}
+
+    #[test]
+    fn test_merge_sorted_case_1() {
+        let mut array1 = [1,2,3,0,0,0];
+        let array2 = [2,5,6];
+        let result = merge_sorted(&mut array1, &array2, 3, 3);
+        assert_eq!(result, vec![1,2,2,3,5,6]);
+    }
 
     #[test]
     fn test_test_case_0() {
